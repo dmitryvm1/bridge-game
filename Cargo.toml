@@ -1,0 +1,9 @@
+[package]
+name = "bridge-game"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+
+[dependencies]
+gpui = { package = "gpui-ce", version = "=0.3.0" }
+gpui_platform = { package = "gpui_ce_platform", version = "=0.3.0", features = ["font-kit", "wayland", "x11"] }

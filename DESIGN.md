@@ -100,7 +100,7 @@ For example, if a player is required to draw cards because of a 7 or 8, they mus
 
 ## 6. Ending a Round
 
-A round ends immediately when a player plays the last card or cards from their hand.
+A round ends when a player plays the last card or cards from their hand, after applying the played cards’ effects. Mandatory draws count toward the recipients’ round scores. A final 6 must still be covered before the round can end.
 
 That player wins the round.
 

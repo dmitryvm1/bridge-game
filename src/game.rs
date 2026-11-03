@@ -274,6 +274,7 @@ impl Game {
                 String::new()
             }
         ));
+        self.effects(actor, &cards);
         if self.players[actor].hand.is_empty() && cards[0].rank != 6 {
             self.finish(
                 actor,
@@ -283,8 +284,6 @@ impl Game {
                     0
                 },
             );
-        } else {
-            self.effects(actor, &cards);
         }
         Ok(())
     }
@@ -498,12 +497,33 @@ mod tests {
         assert_eq!(g.phase, Phase::RoundOver(0));
     }
     #[test]
-    fn finishing_does_not_apply_penalty() {
+    fn final_eight_applies_penalty_before_scoring() {
         let mut g = table(2, c(8, Suit::Clubs));
         g.players[0].hand = vec![c(8, Suit::Hearts)];
-        let len = g.players[1].hand.len();
+        g.deck = vec![c(14, Suit::Spades), c(13, Suit::Diamonds)];
+        g.players[1].score = 100;
         g.play(&[0], Suit::Clubs).unwrap();
-        assert_eq!(g.players[1].hand.len(), len);
+        assert_eq!(g.players[1].hand.len(), 4);
+        assert!(g.deck.is_empty());
+        assert_eq!(g.last_deltas, vec![0, 35]);
+        assert_eq!(g.players[1].score, 135);
+        assert_eq!(g.phase, Phase::GameOver(1));
+    }
+    #[test]
+    fn final_eights_apply_all_penalties() {
+        for n in 2..=4 {
+            let mut g = table(n, c(8, Suit::Clubs));
+            g.players[0].hand = vec![c(8, Suit::Hearts), c(8, Suit::Spades)];
+            g.deck = vec![c(10, Suit::Clubs); 4];
+            g.play(&[0, 1], Suit::Spades).unwrap();
+            assert_eq!(g.phase, Phase::RoundOver(0));
+            assert!(g.players[0].hand.is_empty());
+            assert_eq!(g.players[1].hand.len(), if n == 2 { 6 } else { 4 });
+            if n > 2 {
+                assert_eq!(g.players[2].hand.len(), 4);
+            }
+            assert!(g.deck.is_empty());
+        }
     }
     #[test]
     fn invalid_selection_is_atomic() {

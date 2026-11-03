@@ -29,7 +29,7 @@ For backend setup details, see the [GPUI project](https://github.com/gpui-ce/gpu
 
 Choose 2–4 total players and the Queen of Spades option, then take your seat. Click a legal card to select it. You can add other cards of the same rank, in the order you want to play them; the first card must match the current suit or rank. Click **Play selected**. Choose a suit before playing Jacks. Click **Draw cards** when you have no legal move; sixes automatically draw until covered or the available cards run out.
 
-Seven penalties are accepted immediately; the recipient then takes a normal turn. Eights and Aces distribute their skips among the other players, excluding the actor. The dealer's opening card also applies its effect. An opening Jack uses its printed suit. A winning play ends the round before penalties are applied. Dealers rotate clockwise. Exactly 125 resets to zero, and a score above 125 ends the game.
+Seven penalties are accepted immediately; the recipient then takes a normal turn. Eights and Aces distribute their skips among the other players, excluding the actor. The dealer's opening card also applies its effect. An opening Jack uses its printed suit. A winning play applies its card effects before the round is scored, including mandatory draws for the other players. Dealers rotate clockwise. Exactly 125 resets to zero, and a score above 125 ends the game.
 
 The design does not specify a fully blocked table (all drawable cards exhausted, no legal move in any hand). To ensure progress, the implementation settles that round in favor of the lowest hand penalty, breaking ties by seating order. If multiple players exceed 125 simultaneously, the first in seating order is reported as the loser; all scores remain visible.
 

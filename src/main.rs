@@ -76,8 +76,8 @@ impl Bridge {
     ) -> gpui::Stateful<gpui::Div> {
         div()
             .id(id)
-            .px_4()
-            .py_2()
+            .px_3()
+            .py_1()
             .rounded_md()
             .border_1()
             .border_color(rgb(if active { GOLD } else { 0x3a5047 }))
@@ -89,13 +89,13 @@ impl Bridge {
     }
     fn card(card: Card, selected: bool, legal: bool) -> gpui::Div {
         div()
-            .w(px(76.))
-            .h(px(110.))
+            .w(px(60.))
+            .h(px(84.))
             .flex_none()
             .flex()
             .flex_col()
             .justify_between()
-            .p_2()
+            .p_1()
             .rounded_lg()
             .border_2()
             .border_color(rgb(if selected { GOLD } else { 0xe0e3d8 }))
@@ -107,13 +107,13 @@ impl Bridge {
                 0xc3cbc0
             }))
             .text_color(rgb(if card.suit.red() { 0xac3f46 } else { 0x203d35 }))
-            .text_lg()
+            .text_sm()
             .child(card.label())
-            .child(div().text_3xl().self_center().child(card.suit.symbol()))
+            .child(div().text_2xl().self_center().child(card.suit.symbol()))
             .child(div().self_end().text_sm().child(card.label()))
     }
     fn setup(&self, cx: &mut Context<Self>) -> gpui::Div {
-        div().flex().flex_col().gap_5().max_w(px(640.)).w_full().p_8().rounded_xl().bg(rgb(PANEL)).border_1().border_color(rgb(0x34483c))
+        div().flex().flex_col().gap_3().max_w(px(640.)).w_full().p_3().rounded_xl().bg(rgb(PANEL)).border_1().border_color(rgb(0x34483c))
             .child(div().text_color(rgb(GOLD)).text_sm().child("36 CARDS · 2–4 PLAYERS · ONE LAST CARD"))
             .child(div().text_3xl().child("A seat at the table."))
             .child(div().text_color(rgb(MUTED)).child("Match suits or ranks. Change the game with special cards. Empty your hand, keep your score low, and stay below 126."))
@@ -131,24 +131,24 @@ impl Bridge {
             Phase::RoundOver(w) => format!("{} wins the round", self.game.players[w].name),
             Phase::GameOver(l) => format!("Game over · {} exceeded 125", self.game.players[l].name),
         };
-        let mut field = div().flex().flex_col().flex_1().gap_5().min_w_0()
+        let mut field = div().flex().flex_col().flex_1().gap_3().min_w_0()
             .child(div().flex().gap_3().children(self.game.players.iter().enumerate().skip(1).map(|(i,p)| {
-                div().flex_1().rounded_lg().p_4().border_1().border_color(rgb(if self.game.turn == i && self.game.phase == Phase::Playing { GOLD } else { 0x34483c })).bg(rgb(PANEL))
+                div().flex_1().rounded_lg().p_3().border_1().border_color(rgb(if self.game.turn == i && self.game.phase == Phase::Playing { GOLD } else { 0x34483c })).bg(rgb(PANEL))
                     .child(div().text_color(rgb(MUTED)).text_sm().child(p.name.clone()))
-                    .child(div().mt_2().text_lg().child(format!("{} cards   ·   {} points",p.hand.len(),p.score)))
-                    .child(div().mt_2().text_color(rgb(0x608474)).child("▧ ".repeat(p.hand.len().min(12))))
+                    .child(div().mt_1().text_lg().child(format!("{} cards   ·   {} points",p.hand.len(),p.score)))
+                    .child(div().mt_1().text_color(rgb(0x608474)).child("▧ ".repeat(p.hand.len().min(12))))
             })))
-            .child(div().flex().flex_col().items_center().justify_center().gap_4().py_6().rounded_xl().bg(rgb(0x1c3b30)).border_1().border_color(rgb(0x365544))
+            .child(div().flex().flex_col().items_center().justify_center().gap_2().py_3().rounded_xl().bg(rgb(0x1c3b30)).border_1().border_color(rgb(0x365544))
                 .child(div().text_color(rgb(GOLD)).text_sm().child(format!("ROUND {}   /   {} DEALS",self.game.round,self.game.players[self.game.dealer].name.to_uppercase())))
                 .child(div().flex().gap_6().items_center()
                     .child(div().flex().flex_col().items_center().gap_2()
-                        .child(div().w(px(76.)).h(px(110.)).rounded_lg().border_2().border_color(rgb(0x8da58d)).bg(rgb(0x142b25)).flex().items_center().justify_center().text_3xl().text_color(rgb(GOLD)).child("▧"))
+                        .child(div().w(px(60.)).h(px(84.)).rounded_lg().border_2().border_color(rgb(0x8da58d)).bg(rgb(0x142b25)).flex().items_center().justify_center().text_3xl().text_color(rgb(GOLD)).child("▧"))
                         .child(div().text_sm().text_color(rgb(MUTED)).child(format!("{} in deck",self.game.deck.len()))))
                     .child(div().flex().flex_col().items_center().gap_2().child(Self::card(self.game.top(),false,true)).child(div().text_sm().text_color(rgb(MUTED)).child("Discard"))))
                 .child(div().text_lg().child(status))
                 .child(div().text_sm().text_color(rgb(MUTED)).child(format!("Follow {} or rank · Jacks are wild",self.game.suit.symbol()))))
             .child(div().flex().justify_between().child(div().text_lg().child("Your hand")).child(div().text_color(rgb(GOLD)).child(format!("{} points",self.game.players[0].score))))
-            .child(div().id("hand").flex().flex_wrap().gap_2().children(self.game.players[0].hand.iter().enumerate().map(|(i,&card)| {
+            .child(div().id("hand").flex().flex_wrap().gap_2().max_h(px(176.)).overflow_y_scroll().children(self.game.players[0].hand.iter().enumerate().map(|(i,&card)| {
                 div().id(("card",i)).cursor_pointer().child(Self::card(card,self.selected.contains(&i),human && self.game.legal(card)))
                     .on_click(cx.listener(move |this,_,_,cx| { if this.game.turn == 0 && this.game.phase == Phase::Playing {
                         if let Some(pos)=this.selected.iter().position(|&n|n==i) { this.selected.remove(pos); }
@@ -221,7 +221,7 @@ impl Bridge {
         if self.game.phase != Phase::Playing {
             field = field.child(
                 div()
-                    .p_4()
+                    .p_3()
                     .rounded_lg()
                     .bg(rgb(PANEL))
                     .flex()
@@ -257,11 +257,14 @@ impl Bridge {
                     ),
             );
         }
-        div().flex().gap_6().items_start().child(field).child(
+        div().flex().gap_4().items_start().child(field).child(
             div()
-                .w(px(230.))
+                .id("history")
+                .max_h(px(450.))
+                .overflow_y_scroll()
+                .w(px(200.))
                 .flex_none()
-                .p_4()
+                .p_3()
                 .rounded_lg()
                 .bg(rgb(PANEL))
                 .flex()
@@ -282,28 +285,28 @@ impl Bridge {
 }
 impl Render for Bridge {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        div().size_full().bg(rgb(BG)).text_color(rgb(0xf0f2e9)).font_family("sans-serif").flex().flex_col()
-            .child(div().flex().items_center().justify_between().px_8().py_5().border_b_1().border_color(rgb(0x2b4036))
+        div().size_full().bg(rgb(BG)).text_color(rgb(0xf0f2e9)).font_family("sans-serif").text_sm().flex().flex_col()
+            .child(div().flex().items_center().justify_between().px_4().py_2().border_b_1().border_color(rgb(0x2b4036))
                 .child(div().flex().items_center().gap_3().child(div().text_3xl().text_color(rgb(GOLD)).child("♣")).child(div().text_xl().child("BRIDGE")).child(div().text_sm().text_color(rgb(MUTED)).child("THE 36-CARD GAME")))
                 .child(div().flex().gap_3()
                     .child(self.button("rules","How to play",self.rules).on_click(cx.listener(|this,_,_,cx|{this.rules=!this.rules;cx.notify();})))
                     .child(self.button("new","New game",false).on_click(cx.listener(|this,_,_,cx|{this.started=false;this.selected.clear();cx.notify();})))))
-            .child(div().id("content").flex_1().overflow_y_scroll().p_8()
+            .child(div().id("content").flex_1().min_h_0().overflow_y_scroll().p_3()
                 .child(if self.rules {div().max_w(px(850.)).flex().flex_col().gap_4().child(div().text_2xl().text_color(rgb(GOLD)).child("How to play")).child(div().text_sm().child(include_str!("../DESIGN.md"))).into_any_element()}
                     else if self.started {self.table(cx).into_any_element()}
                     else {div().size_full().flex().items_center().justify_center().child(self.setup(cx)).into_any_element()}))
-            .child(div().px_8().py_3().text_sm().text_color(rgb(MUTED)).border_t_1().border_color(rgb(0x2b4036)).child("6  Cover it    ·    7  Draw 1    ·    8  Draw 2 + skip    ·    J  Choose suit    ·    A  Skip    |    Finish with J: −20 each"))
+            .child(div().px_4().py_2().text_sm().text_color(rgb(MUTED)).border_t_1().border_color(rgb(0x2b4036)).child("6  Cover it    ·    7  Draw 1    ·    8  Draw 2 + skip    ·    J  Choose suit    ·    A  Skip    |    Finish with J: −20 each"))
     }
 }
 fn main() {
     gpui_platform::application()
         .with_quit_mode(QuitMode::LastWindowClosed)
         .run(|cx: &mut App| {
-            let bounds = Bounds::centered(None, size(px(1180.), px(880.)), cx);
+            let bounds = Bounds::centered(None, size(px(1100.), px(680.)), cx);
             cx.open_window(
                 WindowOptions {
                     window_bounds: Some(WindowBounds::Windowed(bounds)),
-                    window_min_size: Some(size(px(920.), px(680.))),
+                    window_min_size: Some(size(px(800.), px(560.))),
                     titlebar: Some(gpui::TitlebarOptions {
                         title: Some("Bridge · The 36-card game".into()),
                         ..Default::default()

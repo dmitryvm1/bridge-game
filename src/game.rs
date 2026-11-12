@@ -105,15 +105,20 @@ impl Game {
                 .as_nanos() as u64
                 | 1,
         };
+        game.dealer = game.random() as usize % game.players.len();
         game.deal();
         game
     }
+    fn random(&mut self) -> u64 {
+        self.rng ^= self.rng << 13;
+        self.rng ^= self.rng >> 7;
+        self.rng ^= self.rng << 17;
+        self.rng
+    }
     fn shuffle(&mut self) {
         for i in (1..self.deck.len()).rev() {
-            self.rng ^= self.rng << 13;
-            self.rng ^= self.rng >> 7;
-            self.rng ^= self.rng << 17;
-            self.deck.swap(i, self.rng as usize % (i + 1));
+            let j = self.random() as usize % (i + 1);
+            self.deck.swap(i, j);
         }
     }
     pub fn note(&mut self, text: String) {
@@ -415,6 +420,26 @@ mod tests {
                     + g.players.iter().map(|p| p.hand.len()).sum::<usize>(),
                 36
             );
+        }
+    }
+    #[test]
+    fn non_dealers_receive_five_cards_for_every_dealer() {
+        for n in 2..=4 {
+            let mut g = Game::new(n, false);
+            for dealer in 0..n {
+                g.dealer = dealer;
+                // Use an opening card without a draw penalty to check the deal itself.
+                for seed in 1.. {
+                    g.rng = seed;
+                    g.deal();
+                    if !matches!(g.top().rank, 7 | 8) {
+                        break;
+                    }
+                }
+                for (i, player) in g.players.iter().enumerate() {
+                    assert_eq!(player.hand.len(), if i == g.dealer { 4 } else { 5 });
+                }
+            }
         }
     }
     #[test]

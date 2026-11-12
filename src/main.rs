@@ -108,8 +108,15 @@ impl Bridge {
             }))
             .text_color(rgb(if card.suit.red() { 0xac3f46 } else { 0x203d35 }))
             .text_sm()
+            .line_height(px(20.))
             .child(card.label())
-            .child(div().text_2xl().self_center().child(card.suit.symbol()))
+            .child(
+                div()
+                    .text_2xl()
+                    .line_height(px(28.))
+                    .self_center()
+                    .child(card.suit.symbol()),
+            )
             .child(div().self_end().text_sm().child(card.label()))
     }
     fn setup(&self, cx: &mut Context<Self>) -> gpui::Div {

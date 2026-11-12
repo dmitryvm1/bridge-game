@@ -309,7 +309,7 @@ fn main() {
     gpui_platform::application()
         .with_quit_mode(QuitMode::LastWindowClosed)
         .run(|cx: &mut App| {
-            let bounds = Bounds::centered(None, size(px(1100.), px(680.)), cx);
+            let bounds = Bounds::centered(None, size(px(1100.), px(780.)), cx);
             cx.open_window(
                 WindowOptions {
                     window_bounds: Some(WindowBounds::Windowed(bounds)),

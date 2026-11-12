@@ -47,7 +47,7 @@ If the draw pile runs out of cards:
 
 ### 6 — Must Be Covered
 
-A 6 must be covered by a card other than another 6.
+A 6 can be covered by another 6 of any suit. Each 6 keeps the player's turn; the final 6 must be covered by a legal card of a different rank.
 
 The player who plays a 6 keeps their turn and must cover it. If they cannot legally cover the 6, they must continue drawing cards until they can play a valid card. This also applies to the dealer's opening card. Playing the last 6 in a hand does not end the round; it must still be covered.
 

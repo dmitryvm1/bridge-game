@@ -169,9 +169,6 @@ impl Game {
         }
     }
     pub fn legal(&self, card: Card) -> bool {
-        if self.top().rank == 6 && card.rank == 6 {
-            return false;
-        }
         card.rank == 11
             || card.suit == self.suit
             || (self.top().rank != 11 && card.rank == self.top().rank)
@@ -421,11 +418,28 @@ mod tests {
         }
     }
     #[test]
-    fn six_cannot_cover_six() {
+    fn six_can_cover_six() {
         let g = table(2, c(6, Suit::Hearts));
-        assert!(!g.legal(c(6, Suit::Spades)));
+        assert!(g.legal(c(6, Suit::Spades)));
         assert!(g.legal(c(11, Suit::Clubs)));
         assert!(g.legal(c(7, Suit::Hearts)));
+        assert!(!g.legal(c(7, Suit::Spades)));
+    }
+    #[test]
+    fn consecutive_sixes_retain_turn_until_a_different_rank_is_played() {
+        let mut g = table(2, c(9, Suit::Hearts));
+        g.players[0].hand = vec![c(6, Suit::Hearts), c(6, Suit::Clubs), c(10, Suit::Clubs)];
+        g.play(&[0], Suit::Hearts).unwrap();
+        assert_eq!(g.turn, 0);
+        assert!(g.can_play());
+        assert!(g.draw().is_err());
+        g.play(&[0], Suit::Clubs).unwrap();
+        assert_eq!(g.top(), c(6, Suit::Clubs));
+        assert_eq!(g.suit, Suit::Clubs);
+        assert_eq!(g.turn, 0);
+        assert_eq!(g.phase, Phase::Playing);
+        g.play(&[0], Suit::Clubs).unwrap();
+        assert_eq!(g.phase, Phase::RoundOver(0));
     }
     #[test]
     fn computer_keeps_turn_until_its_six_is_covered() {
@@ -545,11 +559,28 @@ mod tests {
     fn six_draws_until_a_cover_and_retains_turn() {
         let mut g = table(2, c(6, Suit::Hearts));
         g.players[0].hand = vec![c(9, Suit::Clubs)];
-        g.deck = vec![c(10, Suit::Hearts), c(7, Suit::Spades), c(6, Suit::Clubs)];
+        g.deck = vec![
+            c(10, Suit::Hearts),
+            c(7, Suit::Spades),
+            c(9, Suit::Diamonds),
+        ];
         g.draw().unwrap();
         assert_eq!(g.players[0].hand.len(), 4);
         assert_eq!(g.turn, 0);
         assert!(g.can_play());
+    }
+    #[test]
+    fn drawing_to_cover_six_stops_at_another_six() {
+        let mut g = table(2, c(6, Suit::Hearts));
+        g.players[0].hand = vec![c(9, Suit::Clubs)];
+        g.deck = vec![c(10, Suit::Hearts), c(6, Suit::Clubs)];
+        g.draw().unwrap();
+        assert_eq!(g.players[0].hand.len(), 2);
+        assert_eq!(g.deck.len(), 1);
+        g.play(&[1], Suit::Clubs).unwrap();
+        assert_eq!(g.turn, 0);
+        g.play(&[0], Suit::Clubs).unwrap();
+        assert_eq!(g.phase, Phase::RoundOver(0));
     }
     #[test]
     fn seven_is_mandatory_but_does_not_skip() {

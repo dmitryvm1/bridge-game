@@ -135,6 +135,7 @@ impl Bridge {
         let status = match self.game.phase {
             Phase::Playing if human => "Your turn".into(),
             Phase::Playing => format!("{} is thinking…", self.game.players[self.game.turn].name),
+            Phase::RoundOver(0) => "You win the round".into(),
             Phase::RoundOver(w) => format!("{} wins the round", self.game.players[w].name),
             Phase::GameOver(l) => format!("Game over · {} exceeded 125", self.game.players[l].name),
         };
@@ -146,7 +147,7 @@ impl Bridge {
                     .child(div().mt_1().text_color(rgb(0x608474)).child("▧ ".repeat(p.hand.len().min(12))))
             })))
             .child(div().flex().flex_col().items_center().justify_center().gap_2().py_3().rounded_xl().bg(rgb(0x1c3b30)).border_1().border_color(rgb(0x365544))
-                .child(div().text_color(rgb(GOLD)).text_sm().child(format!("ROUND {}   /   {} DEALS",self.game.round,self.game.players[self.game.dealer].name.to_uppercase())))
+                .child(div().text_color(rgb(GOLD)).text_sm().child(format!("ROUND {}   /   {} {}",self.game.round,self.game.players[self.game.dealer].name.to_uppercase(), if self.game.dealer == 0 { "DEAL" } else { "DEALS" })))
                 .child(div().flex().gap_6().items_center()
                     .child(div().flex().flex_col().items_center().gap_2()
                         .child(div().w(px(60.)).h(px(84.)).rounded_lg().border_2().border_color(rgb(0x8da58d)).bg(rgb(0x142b25)).flex().items_center().justify_center().text_3xl().text_color(rgb(GOLD)).child("▧"))

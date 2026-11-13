@@ -160,9 +160,10 @@ impl Game {
         }
         self.turn = self.next(self.dealer);
         self.note(format!(
-            "Round {} · {} deals {}",
+            "Round {} · {} {} {}",
             self.round,
             self.players[self.dealer].name,
+            if self.dealer == 0 { "deal" } else { "deals" },
             self.top().label()
         ));
         self.effects(self.dealer, &[self.top()]);
@@ -203,7 +204,11 @@ impl Game {
                 actual += 1;
             }
         }
-        self.note(format!("{} draws {actual}", self.players[p].name));
+        self.note(format!(
+            "{} {} {actual}",
+            self.players[p].name,
+            if p == 0 { "draw" } else { "draws" }
+        ));
     }
     fn effects(&mut self, actor: usize, cards: &[Card]) {
         self.turn = self.next(actor);
@@ -219,7 +224,11 @@ impl Game {
                     if cards[0].rank == 8 {
                         self.penalty(target, 2);
                     }
-                    self.note(format!("{} skips a turn", self.players[target].name));
+                    self.note(format!(
+                        "{} {} a turn",
+                        self.players[target].name,
+                        if target == 0 { "skip" } else { "skips" }
+                    ));
                     target = self.next(target);
                 }
                 self.turn = target;
@@ -263,8 +272,9 @@ impl Game {
             cards.last().unwrap().suit
         };
         self.note(format!(
-            "{} plays {}{}",
+            "{} {} {}{}",
             self.players[actor].name,
+            if actor == 0 { "play" } else { "plays" },
             cards
                 .iter()
                 .map(|c| c.label())
@@ -309,8 +319,9 @@ impl Game {
             }
         }
         self.note(format!(
-            "{} draws {count}{}",
+            "{} {} {count}{}",
             self.players[p].name,
+            if p == 0 { "draw" } else { "draws" },
             if cover { " to cover the six" } else { "" }
         ));
         if !self.can_play() {
@@ -362,8 +373,10 @@ impl Game {
             .map(Phase::GameOver)
             .unwrap_or(Phase::RoundOver(winner));
         self.note(format!(
-            "{} wins round {}",
-            self.players[winner].name, self.round
+            "{} {} round {}",
+            self.players[winner].name,
+            if winner == 0 { "win" } else { "wins" },
+            self.round
         ));
     }
     pub fn bot_step(&mut self) {
